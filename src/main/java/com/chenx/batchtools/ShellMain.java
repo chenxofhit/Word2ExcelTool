@@ -2,6 +2,7 @@ package com.chenx.batchtools;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,22 +91,28 @@ public class ShellMain {
 		Menu menu = new Menu(shellMain, SWT.BAR);
 		shellMain.setMenuBar(menu);
 		
-		MenuItem mntmAbout = new MenuItem(menu, SWT.NONE);
-
-		mntmAbout.setText("About");
+		MenuItem mntmHelp = new MenuItem(menu, SWT.CASCADE);
+		mntmHelp.setText("Help");
+		
+		Menu menu_Main = new Menu(mntmHelp);
+		mntmHelp.setMenu(menu_Main);
+		
+		MenuItem mntmAbout = new MenuItem(menu_Main, SWT.NONE);
+		
+				mntmAbout.setText("About");
 		
 		mntmAbout.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				MessageBox messageBox = new MessageBox(shellMain,  SWT.CANCEL | SWT.OK);
 			    messageBox.setText("About");
-			    messageBox.setMessage("Any  question, please contact to chenxofhit@gmail.com !");
+			    messageBox.setMessage("Any  question, please contact me  with chenxofhit@gmail.com !");
 			    messageBox.open();
 			}
 		});
 		
 		Label lblHelp = new Label(shellMain, SWT.NONE);
-		lblHelp.setText("请选择包含 word 文件的文件夹:");
+		lblHelp.setText("请选择包含 word 文件(*.docx)的文件夹:");
 		new Label(shellMain, SWT.NONE);
 		
 		Label label_1 = new Label(shellMain, SWT.SEPARATOR | SWT.HORIZONTAL);
@@ -138,6 +145,9 @@ public class ShellMain {
 	        				text.append("发现 word 文档："+ f.getAbsolutePath() + "\r\n");
 	        			}
         				text.append("总计发现 word 文档："+ len +  "个，请点击 开始 按钮进行转换 \r\n");
+        				if(len >= 5) {
+            				text.append("提示：文档数目比较多，当你点击开始的时候界面可能僵死，但是程序仍在执行的！ \r\n");
+        				}
 	        		}else {
         				text.append("没有找到 word 文档，请重新选择文件夹 \r\n");
 	        		}
@@ -156,6 +166,8 @@ public class ShellMain {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				
+				text.append("开始处理单个文件，请稍候... \r\n");
+				
 				for (String f : docfiles) {
 					
 			        File file = new File(f);
@@ -167,16 +179,12 @@ public class ShellMain {
 			            	String docText = doc.getDocumentText();
 			            	System.out.println(docText);
 			            }else if(f.endsWith(".docx")) {
-//			            	XWPFDocument xdoc = new XWPFDocument(fis);
-//			                XWPFWordExtractor extractor = new XWPFWordExtractor(xdoc);
-//			                String doc1 = extractor.getText();
-//			                System.out.println(doc1);
+			            	
 			                Handler docxHanlder =  new DocxHandler();
 			                List<String> paraTexts = docxHanlder.exec(f);
 			                
 
 			                String excelFileName = f  + ".xlsx";// name of excel file
-			             
 			                String sheetName = "Sheet1";// name of sheet
 			             
 			                XSSFWorkbook wb = new XSSFWorkbook();
@@ -214,14 +222,82 @@ public class ShellMain {
 			                // write this workbook to an Outputstream.
 			                wb.write(fileOut);
 			                fileOut.flush();
-
 			                text.append("恭喜，输出到文件：" + excelFileName+ "成功！\r\n");
-			                
 			            }
 			            fis.close();
 			        } catch (Exception ecpt) {
 			        	ecpt.printStackTrace();
 			        }
+				}
+				
+				text.append("开始汇总文件，请稍候... \r\n");
+                String excelFileName = textDirectory.getText() + "/summary.xlsx";// name of excel file
+                String sheetName = "Sheet1";// name of sheet
+	             
+                XSSFWorkbook wb = new XSSFWorkbook();
+                XSSFSheet sheet = wb.createSheet(sheetName);
+                
+                FileOutputStream fileOut;
+				try {
+					fileOut = new FileOutputStream(excelFileName);
+				
+                
+				for (String f : docfiles) {
+					
+			        File file = new File(f);
+			        try {
+			            FileInputStream fis = new FileInputStream(file);
+			            
+			            if(f.endsWith(".doc")) {
+			            	HWPFDocument doc = new HWPFDocument(fis);
+			            	String docText = doc.getDocumentText();
+			            	System.out.println(docText);
+			            }else if(f.endsWith(".docx")) {
+			            	
+			                Handler docxHanlder =  new DocxHandler();
+			                List<String> paraTexts = docxHanlder.exec(f);
+
+			             
+			                // iterating r number of rows
+			                for (int r = 0; r < paraTexts.size(); r++)
+			                {
+			                  XSSFRow row = sheet.createRow(r);
+			                  
+			                  //第一个单元格
+			                  XSSFCell cell = row.createCell(0);
+			                  CellStyle cs = wb.createCellStyle();
+			                  cs.setWrapText(true);
+			                  cell.setCellStyle(cs);
+			                  cell.setCellValue("第" + ChineseNumberConverter.convert(r+1)+"条"); 
+			                
+			                  //第二个单元格
+			                  cell = row.createCell(1);
+			                  cs = wb.createCellStyle();
+			                  cs.setWrapText(true);
+			                  cell.setCellStyle(cs);
+			                  cell.setCellValue(paraTexts.get(r));
+			                  
+			                  //第三个单元格
+			                  cell = row.createCell(2);
+			                  cs = wb.createCellStyle();
+			                  cs.setWrapText(true);
+			                  cell.setCellStyle(cs);
+			                  cell.setCellValue(file.getName());
+			                  
+			                }
+			             
+			                // write this workbook to an Outputstream.
+			                wb.write(fileOut);
+			            }
+			            fis.close();
+			        } catch (Exception ecpt) {
+			        	ecpt.printStackTrace();
+			        }
+				}
+				fileOut.flush();
+                text.append("恭喜，输出到汇总文件：" + excelFileName+ "成功！\r\n");
+				} catch (Exception e1) {
+					e1.printStackTrace();
 				}
 			}
 		});
@@ -231,10 +307,9 @@ public class ShellMain {
 		btnGo.setText("开始!");
 		
 		text = new Text(shellMain, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
-		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
+		GridData gd_text = new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1);
 		gd_text.heightHint = 135;
 		text.setLayoutData(gd_text);
 
 	}
-
 }

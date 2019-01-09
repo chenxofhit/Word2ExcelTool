@@ -16,7 +16,6 @@ public class DocFilenameFilter implements FilenameFilter {
 		boolean flag = true;
 		if (name.toLowerCase().endsWith(".doc")) {
 			flag = false;
-			
 		} else if (name.toLowerCase().endsWith(".docx")) {
 
 		} else {
