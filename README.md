@@ -10,7 +10,7 @@ SWT,  Maven, Apache  POI, Cross platform
 
 ## How to run ?
 
-For running the application with your OS,  please select proper maven dependency jar in the pom.xml after you cloned the reponsitory. The folllowing codes are recommended to compile the project.
+For running the application with your OS,  please select proper maven dependency jar in the pom.xml after you cloned the reponsitory. The following codes are recommended to compile the project.
 
 ```shell
 git clone https://github.com/chenxofhit/Word2ExcelTool.git
