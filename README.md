@@ -5,14 +5,17 @@ The program is to use Apache POI 4.8 to extract words from MS office Word suppor
 with the format according to my brother's request.
 
 ## Features
-SWT + Maven + Apache  POI
+SWT,  Maven, Apache  POI, Cross platform
 
 
 ## How to run ?
 
-```git clone https://github.com/chenxofhit/Word2ExcelTool.git
+For running the application with your OS,  please select proper maven dependency jar in the pom.xml after you cloned the reponsitory. The folllowing codes are recommended to compile the project.
+
+```shell
+git clone https://github.com/chenxofhit/Word2ExcelTool.git
 cd Word2ExcelTool
 mvn package -Dmaven.test.skip=true
 cd ./target
-java -jar tool-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+java -jar tool-0.0.1-jar-with-dependencies.jar
 ```
