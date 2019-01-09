@@ -1,7 +1,7 @@
 # Word2ExcelTool
 A SWT application writing for my brother.
 
-The program is to use Apache POI 4.8 to extract words from MS office Word supported *.docx file and output them in  another excel,
+The program is to use Apache POI 3.11 to extract words from MS office Word supported *.docx file and output them in  another excel,
 with the format according to my brother's request.
 
 ## Features
