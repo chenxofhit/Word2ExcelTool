@@ -17,5 +17,9 @@ git clone https://github.com/chenxofhit/Word2ExcelTool.git
 cd Word2ExcelTool
 mvn package -Dmaven.test.skip=true
 cd ./target
-java -jar tool-0.0.1-jar-with-dependencies.jar
+java -jar tool-0.0.1-jar-with-dependencies.jar 
 ```
+
+The following snapshot is taken from  a  Windows 32 bit machine after executing the codes:
+
+![img](https://ws2.sinaimg.cn/large/006tNc79gy1fz03t8b077j30rb07rq4f.jpg)
